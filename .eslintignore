@@ -1,0 +1,20 @@
+# PM2 ecosystem config (needs CommonJS)
+ecosystem.config.js
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Dependencies
+node_modules/
+
+# Logs
+logs/
+
+# Environment files
+.env*
+
+# PM2 files
+.pm2/
