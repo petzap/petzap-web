@@ -5,7 +5,7 @@ export interface PostLocation {
   longitude: number;
 }
 
-export interface ReportedPostItem {
+export interface PostItem {
   location: PostLocation;
   _id: string;
   media: string[];
@@ -32,10 +32,10 @@ export interface PostReporter {
 export interface PostReport {
   _id: string;
   reporter: User;
-  reportedItem: ReportedPostItem | null;
+  reportedItem: PostItem | null;
   type: "Post" | "User" | "Pet" | "Comment" | "Review";
   reason: string;
-  status: "PENDING" | "RESOLVED" | "REJECTED";
+  status: "PENDING" | "RESOLVED" | "REVIEWED";
   createdAt: string;
   updatedAt: string;
   __v: number;

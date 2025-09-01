@@ -1,8 +1,8 @@
-// import PetReports from "@/ui/admin/reports/reportedPets";
-// import React from "react";
+import { ReportedPets } from "@/ui/admin";
+import React from "react";
 
 const ReportedPetPage = () => {
-  // return <PetReports />;
+  return <ReportedPets />;
 };
 
 export default ReportedPetPage;

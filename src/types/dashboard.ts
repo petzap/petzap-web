@@ -63,7 +63,13 @@ export interface Review {
   rating: number;
   review: string;
   media: string[];
-  reviewerId: string;
+  reviewer: {
+    _id: string;
+    username: string;
+    image: string;
+    fullName: string;
+    email: string;
+  };
   status: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
   updatedAt: string;

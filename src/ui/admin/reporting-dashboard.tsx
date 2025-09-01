@@ -34,14 +34,6 @@ export function ReportingUI() {
       iconColor: "text-red-600",
     },
     {
-      title: "reviews",
-      icon: <MdOutlineReviews size={fontSize} />,
-      itemLength: DashboardStats?.counts?.reviews,
-      color: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
-    },
-    {
       title: "reported pets",
       icon: <BsSignpost2 size={fontSize} />,
       itemLength: DashboardStats?.counts?.pets,
@@ -116,7 +108,7 @@ export function ReportingUI() {
         </p>
       </div>
 
-      <Grid columns={{ xs: "1", sm: "2", md: "4", lg: "4" }} gap="6">
+      <Grid columns={{ xs: "1", sm: "2", md: "3", lg: "3" }} gap="6">
         {userOtherInfo?.map((item, i) => {
           const getRoute = (title: string) => {
             switch (title) {

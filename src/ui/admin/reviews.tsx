@@ -1,44 +1,22 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import {
-  Flex,
   Grid,
   Button,
   Badge,
   Card,
   Text,
-  Avatar,
   Select,
+  Avatar,
 } from "@radix-ui/themes";
 import {
   MdOutlineReviews,
   MdOutlineStar,
   MdOutlineAccessTime,
 } from "react-icons/md";
-import { getReviews } from "@/api/api-call/reporting-api";
-
-interface Review {
-  _id: string;
-  rating: number;
-  review: string;
-  media: string[];
-  reviewerId: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
-
-interface ReviewsResponse {
-  message: string;
-  data: Review[];
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
-}
+import { getReviews, reviewStatusUpdate } from "@/api/api-call/reporting-api";
+import { Review } from "@/types";
+import Image from "next/image";
 
 function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -117,9 +95,18 @@ function Reviews() {
     });
   };
 
-  const handleStatusChange = async (reviewId: string, newStatus: string) => {
-    // TODO: Implement status update API call
-    console.log(`Updating status for ${reviewId} to ${newStatus}`);
+  const handleStatusChange = async (
+    reviewId: string,
+    newStatus: "APPROVED" | "REJECTED"
+  ) => {
+    const res = await reviewStatusUpdate(reviewId, newStatus);
+    if (res) {
+      setReviews((prevReviews: Review[]) =>
+        prevReviews.map((review) =>
+          review._id === reviewId ? { ...review, status: newStatus } : review
+        )
+      );
+    }
   };
 
   const renderStars = (rating: number) => {
@@ -185,7 +172,7 @@ function Reviews() {
             </div>
             <div>
               <Text size="2" color="gray">
-                Total Reviews
+                Total Reviews{" "}
               </Text>
               <Text size="4" weight="bold">
                 {pagination.total}
@@ -200,7 +187,7 @@ function Reviews() {
             </div>
             <div>
               <Text size="2" color="gray">
-                Pending
+                Pending{" "}
               </Text>
               <Text size="4" weight="bold">
                 {reviews.filter((r) => r.status === "PENDING").length}
@@ -215,7 +202,7 @@ function Reviews() {
             </div>
             <div>
               <Text size="2" color="gray">
-                Approved
+                Approved{" "}
               </Text>
               <Text size="4" weight="bold">
                 {reviews.filter((r) => r.status === "APPROVED").length}
@@ -230,7 +217,7 @@ function Reviews() {
             </div>
             <div>
               <Text size="2" color="gray">
-                Rejected
+                Rejected{" "}
               </Text>
               <Text size="4" weight="bold">
                 {reviews.filter((r) => r.status === "REJECTED").length}
@@ -260,7 +247,7 @@ function Reviews() {
                     </div>
                     <div>
                       <Text size="3" weight="bold" color="gray">
-                        App Review
+                        App Review {" "}
                       </Text>
                       <Text size="2" color="gray">
                         Submitted on {formatDate(review.createdAt)}
@@ -274,11 +261,27 @@ function Reviews() {
 
                 {/* Rating */}
                 <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <Avatar
+                      src={review.reviewer.image}
+                      fallback={review.reviewer?.username?.charAt(0)}
+                      size="5"
+                      radius="full"
+                    />
+                    <div className="flex flex-col space-y-1">
+                      <Text size="1" color="gray">
+                        @{review.reviewer.username}
+                      </Text>
+                      <Text size="1" color="gray">
+                        {review.reviewer.email}
+                      </Text>
+                    </div>
+                  </div>
                   <Text
                     size="2"
                     weight="bold"
                     color="gray"
-                    className="mb-2 block"
+                    className="my-2 block"
                   >
                     Rating
                   </Text>
@@ -319,11 +322,13 @@ function Reviews() {
                         </Text>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                           {review.media.map((media, index) => (
-                            <img
+                            <Image
                               key={index}
                               src={media}
                               alt={`Media ${index + 1}`}
                               className="w-full h-20 object-cover rounded-lg"
+                              width={100}
+                              height={100}
                             />
                           ))}
                         </div>

@@ -1,17 +1,16 @@
 "use server";
 
 import { serverAction } from "@/api/server-action";
-import {
-  DASHBOARD_STATS,
-  REPORT_STATUS_UPDATE_ENDPOINT,
-  REVIEWS_ENDPOINT,
-} from "../endpoints";
+import { DASHBOARD_STATS, REVIEWS_ENDPOINT } from "../endpoints";
 import toast from "react-hot-toast";
 import {
   DashboardReportsResponse,
   ApiError,
   PostReportsResponse,
+  UserReportsResponse,
+  PetReportsResponse,
 } from "@/types";
+import { FilteredStatsResponse } from "@/types/filters";
 
 export const getDashboardStats = async () => {
   try {
@@ -43,6 +42,21 @@ export const getReportedPosts = async (page: number, type: string) => {
   }
 };
 
+export const getReportedUsers = async (page: number, type: string) => {
+  try {
+    const response = await serverAction({
+      url: `/dashboard/user-reports?page=${page}&limit=10?status=${type}`,
+      method: "GET",
+    });
+    if (response.state && response.data) {
+      return response.data as UserReportsResponse;
+    }
+  } catch (error) {
+    console.error("Error fetching reported users:", error);
+    return null;
+  }
+};
+
 export const getReviews = async (page: number, type: string) => {
   try {
     const response = await serverAction({
@@ -65,7 +79,7 @@ export const getReportedPets = async (page: number, type: string) => {
       method: "GET",
     });
     if (response.state && response.data) {
-      return response.data;
+      return response.data as PetReportsResponse;
     }
   } catch (error) {
     console.error("Error fetching reported pets:", error);
@@ -109,20 +123,19 @@ export const reviewStatusUpdate = async (id: string, status: string) => {
   }
 };
 
-export const commentStatusUpdate = async (id: string, status: string) => {
+export const getFilteredStates = async (selectedFilter: string) => {
   try {
     const response = await serverAction({
-      url: `${REPORT_STATUS_UPDATE_ENDPOINT}/${id}`,
-      method: "PUT",
-      body: { status },
+      url: `/dashboard/latest-entities-stats?period=${selectedFilter}`,
+      method: "GET",
     });
-    if (response.state && response.data) {
-      return response.data;
+
+    if (response?.state && response?.data) {
+      return response.data as FilteredStatsResponse;
     }
   } catch (error) {
     const apiError = error as ApiError;
     toast.error(apiError.response?.data?.message || "An error occurred");
     console.error("Error during submission:", error);
-    return null;
   }
 };

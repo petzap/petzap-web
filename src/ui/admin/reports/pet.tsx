@@ -5,18 +5,20 @@ import {
   MdOutlineReviews,
   MdOutlineLocationOn,
   MdOutlineAccessTime,
+  MdOutlinePets,
 } from "react-icons/md";
 import { LiaUserFriendsSolid } from "react-icons/lia";
-import { BsSignpost2, BsHeart } from "react-icons/bs";
+import { BsSignpost2 } from "react-icons/bs";
 import {
-  getReportedPosts,
+  getReportedPets,
   reportStatusUpdate,
 } from "@/api/api-call/reporting-api";
-import { PostReport } from "@/types";
+import { PetReport } from "@/types";
+import { GiSittingDog } from "react-icons/gi";
 import Image from "next/image";
 
-export function ReportedPosts() {
-  const [reportedPosts, setReportedPosts] = useState<PostReport[]>([]);
+export function ReportedPets() {
+  const [reportedPets, setReportedPets] = useState<PetReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentStatus, setCurrentStatus] = useState("ALL");
@@ -28,15 +30,15 @@ export function ReportedPosts() {
   const fetchReportedPosts = async () => {
     setLoading(true);
     try {
-      const response = await getReportedPosts(currentPage, currentStatus);
+      const response = await getReportedPets(currentPage, currentStatus);
       if (response && Array.isArray(response.data)) {
-        setReportedPosts(response.data);
+        setReportedPets(response.data);
       } else {
-        setReportedPosts([]);
+        setReportedPets([]);
       }
     } catch (error) {
-      console.error("Error fetching reported posts:", error);
-      setReportedPosts([]);
+      console.error("Error fetching reported pets:", error);
+      setReportedPets([]);
     } finally {
       setLoading(false);
     }
@@ -86,8 +88,8 @@ export function ReportedPosts() {
   ) => {
     const res = await reportStatusUpdate(id, newStatus);
     if (res) {
-      setReportedPosts((prevReviews: PostReport[]) =>
-        prevReviews.map((item: PostReport) =>
+      setReportedPets((prevReviews: PetReport[]) =>
+        prevReviews.map((item: PetReport) =>
           item._id === id ? { ...item, status: newStatus } : item
         )
       );
@@ -142,7 +144,7 @@ export function ReportedPosts() {
                 Total Reports
               </Text>
               <Text size="4" weight="bold">
-                {reportedPosts.length}
+                {reportedPets.length}
               </Text>
             </div>
           </div>
@@ -157,7 +159,7 @@ export function ReportedPosts() {
                 Pending
               </Text>
               <Text size="4" weight="bold">
-                {reportedPosts.filter((p) => p.status === "PENDING").length}
+                {reportedPets.filter((p) => p.status === "PENDING").length}
               </Text>
             </div>
           </div>
@@ -172,7 +174,7 @@ export function ReportedPosts() {
                 Resolved
               </Text>
               <Text size="4" weight="bold">
-                {reportedPosts.filter((p) => p.status === "RESOLVED").length}
+                {reportedPets.filter((p) => p.status === "RESOLVED").length}
               </Text>
             </div>
           </div>
@@ -187,54 +189,54 @@ export function ReportedPosts() {
                 Reviewed
               </Text>
               <Text size="4" weight="bold">
-                {reportedPosts.filter((p) => p.status === "REVIEWED").length}
+                {reportedPets.filter((p) => p.status === "REVIEWED").length}
               </Text>
             </div>
           </div>
         </Card>
       </Grid>
 
-      {/* Reported Posts List */}
+      {/* Reported Pets List */}
       <div className="space-y-4">
-        {reportedPosts.length === 0 ? (
+        {reportedPets.length === 0 ? (
           <Card className="p-8 text-center">
             <Text size="3" color="gray">
-              No reported posts found
+              No reported pets found
             </Text>
           </Card>
         ) : (
-          reportedPosts.map((post) => (
-            <Card key={post._id} className="p-6">
+          reportedPets.map((pet) => (
+            <Card key={pet._id} className="p-6">
               <div className="space-y-4">
                 {/* Report Header */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-gray-100 rounded-lg">
-                      {getTypeIcon(post.type)}
+                      {getTypeIcon(pet.type)}
                     </div>
                     <div className="space-y-1">
                       <Text size="3" weight="bold" color="gray">
-                        {post.type} Report
+                        {pet.type} Report
                       </Text>
                       <Text size="2" color="gray" className="pl-1">
-                        Reported on {formatDate(post.createdAt)}
+                        Reported on {formatDate(pet.createdAt)}
                       </Text>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <Badge
-                      color={getStatusColor(post.status)}
+                      color={getStatusColor(pet.status)}
                       variant="soft"
                       className="text-xs"
                     >
-                      {post.status}
+                      {pet.status}
                     </Badge>
                     <div className="text-right">
                       <Text size="1" color="gray" className="block">
-                        Report ID: {post._id.slice(-8)}
+                        Report ID: {pet._id.slice(-8)}
                       </Text>
                       <Text size="1" color="gray" className="block">
-                        Updated: {formatDate(post.updatedAt)}
+                        Updated: {formatDate(pet.updatedAt)}
                       </Text>
                     </div>
                   </div>
@@ -256,20 +258,20 @@ export function ReportedPosts() {
                       </Text>
                       <div className="flex items-center gap-3">
                         <Avatar
-                          src={post.reporter.image}
-                          fallback={post.reporter?.fullName?.charAt(0)}
+                          src={pet.reporter.image}
+                          fallback={pet.reporter?.fullName?.charAt(0)}
                           size="5"
                           radius="full"
                         />
                         <div className="flex flex-col space-y-1">
                           <Text size="2" weight="bold">
-                            {post.reporter.fullName}
+                            {pet.reporter.fullName}
                           </Text>
                           <Text size="1" color="gray">
-                            @{post.reporter.username}
+                            @{pet.reporter.username}
                           </Text>
                           <Text size="1" color="gray">
-                            {post.reporter.email}
+                            {pet.reporter.email}
                           </Text>
                         </div>
                       </div>
@@ -290,20 +292,20 @@ export function ReportedPosts() {
                           <Text size="2" weight="bold">
                             Reason:
                           </Text>
-                          <Text size="2">{post.reason}</Text>
+                          <Text size="2">{pet.reason}</Text>
                         </div>
                         <div className="flex items-center gap-2">
                           <Text size="2" weight="bold">
                             Report Type:
                           </Text>
-                          <Text size="2">{post.type}</Text>
+                          <Text size="2">{pet.type}</Text>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Right Column - Reported Content */}
-                  {post.reportedItem && (
+                  {pet.reportedItem && (
                     <div className="bg-gray-50 rounded-lg p-4">
                       <Text
                         size="2"
@@ -313,67 +315,61 @@ export function ReportedPosts() {
                       >
                         Reported Content
                       </Text>
+
                       <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
+                            <MdOutlinePets size={16} />
+                            <Text size="2">
+                              Pet Name: <b>{pet.reportedItem.name}</b>,
+                            </Text>
+                            <Text size="2">
+                              ({pet.reportedItem.age}yrs old{" "}
+                              {pet.reportedItem.gender})
+                            </Text>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <GiSittingDog size={16} />
+                          <Text size="2">Breed: {pet.reportedItem.breed}</Text>
+                          <Text size="2">({pet.reportedItem.type})</Text>
+                        </div>
+
                         <div className="flex items-center gap-2">
                           <MdOutlineAccessTime size={16} />
                           <Text size="2">
-                            Posted on {formatDate(post.reportedItem.createdAt)}
+                            Posted on{" "}
+                            {formatDate(pet.reportedItem.createdAt ?? "")}
                           </Text>
                         </div>
 
-                        {post.reportedItem.location && (
+                        {pet.reportedItem.location && (
                           <div className="flex items-center gap-2">
                             <MdOutlineLocationOn size={16} />
                             <Text size="2">
                               Location:{" "}
-                              {post.reportedItem.location.latitude.toFixed(4)},{" "}
-                              {post.reportedItem.location.longitude.toFixed(4)}
+                              {pet.reportedItem.location?.latitude?.toFixed(4)},{" "}
+                              {pet.reportedItem.location?.longitude?.toFixed(4)}
                             </Text>
                           </div>
                         )}
 
                         <div className="flex items-center gap-2">
-                          <BsHeart size={16} />
-                          <Text size="2">
-                            {post.reportedItem.likes.length} likes
-                          </Text>
-                        </div>
-
-                        {post.reportedItem.description && (
                           <div>
-                            <Text size="2" weight="bold">
-                              Description:
+                            <Text size="2" weight="bold" className="mb-2 block">
+                              Media:
                             </Text>
-                            <Text size="2" className="ml-2">
-                              {post.reportedItem.description}
-                            </Text>
-                          </div>
-                        )}
-
-                        {post.reportedItem.media &&
-                          post.reportedItem.media.length > 0 && (
-                            <div>
-                              <Text
-                                size="2"
-                                weight="bold"
-                                className="mb-2 block"
-                              >
-                                Media:
-                              </Text>
-                              <div className="grid grid-cols-2 gap-2">
-                                {post.reportedItem.media.map((media, index) => (
-                                  <Image
-                                    key={index}
-                                    src={media}
-                                    alt={`Media ${index + 1}`}
-                                    className="w-full h-24 object-cover rounded-lg"
-                                    width={100}
-                                    height={100}
-                                  />
-                                ))}
-                              </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Image
+                                src={pet.reportedItem.image}
+                                alt={`Media`}
+                                width={100}
+                                height={100}
+                                className="w-full h-24 object-cover rounded-lg"
+                              />
                             </div>
-                          )}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -385,7 +381,7 @@ export function ReportedPosts() {
                     variant="soft"
                     color="green"
                     size="2"
-                    onClick={() => handleStatusChange(post._id, "RESOLVED")}
+                    onClick={() => handleStatusChange(pet._id, "RESOLVED")}
                   >
                     Resolve
                   </Button>
@@ -393,7 +389,7 @@ export function ReportedPosts() {
                     variant="soft"
                     color="blue"
                     size="2"
-                    onClick={() => handleStatusChange(post._id, "REVIEWED")}
+                    onClick={() => handleStatusChange(pet._id, "REVIEWED")}
                   >
                     Review
                   </Button>
@@ -401,7 +397,7 @@ export function ReportedPosts() {
                     variant="outline"
                     size="2"
                     onClick={() =>
-                      window.open(`/admin/reports/${post._id}`, "_blank")
+                      window.open(`/admin/reports/${pet._id}`, "_blank")
                     }
                   >
                     View Full Details
@@ -414,7 +410,7 @@ export function ReportedPosts() {
       </div>
 
       {/* Pagination */}
-      {reportedPosts.length > 0 && (
+      {reportedPets.length > 0 && (
         <div className="flex items-center justify-center gap-2">
           <Button
             variant="outline"
